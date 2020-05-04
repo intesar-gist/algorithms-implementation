@@ -1,3 +1,4 @@
+# Problem # 1.4 
 """
     Palindrome Permutation: Given a string, write a function to check if it is a permutation of a palindrome.
     A palindrome is a word or phrase that is the same forwards and backwards. A permutation
@@ -5,13 +6,26 @@
     
     Complexity of my solutions is O(N) with the optimization of space in (palindromePermutation_BitVector)
 """
-import string
+
+def isValidChar(char):
+    return (ord('a') <= ord(char) <= ord('z')) or (ord('A') <= ord(char) <= ord('Z'))
+
+def getBitIndex(char):
+    if (ord('a') <= ord(char) <= ord('z')):
+        return ord(char) - ord('a')
+    elif (ord('A') <= ord(char) <= ord('Z')):
+        return ord(char) - ord('A') 
+    
+    """
+        If case-sensitivity needs to be considered in palindrome, then add +26 to any return command
+        ex: 'aNnA' is not a palindrome in this case
+    """
+
 def palindromePermutation_AuxSpace(st):
-    ascii_char = dict.fromkeys(string.ascii_lowercase + string.ascii_uppercase, True) 
     
     dictionary = {}
-    for char in st.lower():
-        if(ascii_char.get(char) != None): # ignore char that are not ASCII
+    for char in st:
+        if(isValidChar(char)): # ignore chars that are not english alphabets
             if dictionary.get(char) == None or dictionary.get(char) == 0:
                 dictionary[char] = 1
             else:
@@ -31,13 +45,14 @@ def palindromePermutation_AuxSpace(st):
     
 
 def palindromePermutation_BitVector(st):
-    ascii_char = dict.fromkeys(string.ascii_lowercase, True) 
+    #ascii_char = dict.fromkeys(string.ascii_lowercase, True) 
     storage = 0
-    for char in st.lower():
+    for char in st:
         
-        bitIndex = ord(char) - ord('a')
-        
-        if(ascii_char.get(char) != None): # ignore char that are not ASCII
+        if(isValidChar(char)): # ignore chars that are not english alphabets
+            
+            bitIndex = getBitIndex(char)
+            
             if ((storage & 1<<bitIndex) == 0): # if bitIndex'th bit is OFF, then turn it on
                 storage |= 1<<bitIndex
             else:
@@ -49,8 +64,7 @@ def palindromePermutation_BitVector(st):
             then, the provided string is considered to be permutation of a palindrome
     """
     return (storage == 0 or (storage & (storage-1) == 0))
-    
-#palindromePermutation_BitVector("anaaacaaaana") #madamimadam, imada m'm adam, never odd or even
+
 
 import unittest
 class Test(unittest.TestCase):
@@ -63,7 +77,10 @@ class Test(unittest.TestCase):
         ('Random Words', False),
         ('Not a Palindrome', False),
         ('no x in nixon', True),
-        ('azAZ', True)]
+        ('azAZ', True),
+        ('MaDaM i M aDaM', True),
+        ('anaaacaaaana', False),
+        ('aNnA', True)]
 
     def test_palindromePermutation_BitVector(self):
         for [test_string, expected] in self.data:
